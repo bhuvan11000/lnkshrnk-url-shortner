@@ -1,9 +1,7 @@
 import re
 import sqlite3
-from contextlib import contextmanager
-from typing import Optional
-
 from pathlib import Path
+from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, RedirectResponse
