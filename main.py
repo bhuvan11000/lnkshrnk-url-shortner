@@ -3,8 +3,10 @@ import sqlite3
 from contextlib import contextmanager
 from typing import Optional
 
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from nanoid import generate as nanoid_generate
@@ -174,11 +176,24 @@ def stats(code: str):
 
 
 # ---------------------------------------------------------------------------
-# Redirect route  — registered AFTER /api/* routes, BEFORE static mount
+# Redirect route — registered AFTER all /api/* routes to avoid
+# shadowing them. NOTE: the StaticFiles mount below is defined AFTER this
+# route (per spec), so requests for real files like /style.css would
+# otherwise hit this handler first. To avoid that, we detect file-like
+# codes (containing a dot) and serve the static file directly via
+# FileResponse, letting the mount handle "/" and fallback cases.
 # ---------------------------------------------------------------------------
 
 @app.get("/{code}")
 def redirect_to_original(code: str):
+    # If code looks like a file (contains a dot), try to serve it from
+    # public/ directly so static assets aren't shadowed by the DB lookup.
+    if "." in code:
+        file_path = Path("public") / code
+        if file_path.is_file():
+            return FileResponse(str(file_path))
+        raise HTTPException(status_code=404, detail="Not Found")
+
     conn = get_conn()
     try:
         try:
@@ -205,7 +220,9 @@ def redirect_to_original(code: str):
 
 
 # ---------------------------------------------------------------------------
-# Static files — mounted LAST to avoid shadowing API & redirect routes
+# Static files — mounted AFTER all API routes and the redirect route
+# (per spec) using StaticFiles(directory="public", html=True).
+# Serves index.html for "/" and any remaining static assets.
 # ---------------------------------------------------------------------------
 app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
