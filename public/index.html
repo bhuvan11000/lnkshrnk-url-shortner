@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lnkshrnk — URL Shortener</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1 class="logo">lnkshrnk</h1>
+      <p class="tagline">Short links, simple &amp; fast.</p>
+    </header>
+
+    <section class="card">
+      <form id="shorten-form" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="url-input">Long URL</label>
+          <input
+            id="url-input"
+            type="url"
+            placeholder="https://example.com/very/long/url"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="custom-input">Custom code <span class="optional">(optional, 3-20 chars: A-Z a-z 0-9 _ -)</span></label>
+          <input
+            id="custom-input"
+            type="text"
+            placeholder="my-code"
+            maxlength="20"
+            pattern="[A-Za-z0-9_-]{3,20}"
+          />
+        </div>
+
+        <button id="submit-btn" type="submit">Shorten</button>
+      </form>
+
+      <!-- Feedback areas -->
+      <p id="error-msg" class="msg error hidden" role="alert"></p>
+
+      <div id="result" class="result hidden">
+        <p class="result-label">Your short URL:</p>
+        <div class="result-row">
+          <a id="short-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+          <button id="copy-btn" type="button">Copy</button>
+        </div>
+        <p id="copy-feedback" class="copy-feedback hidden">Copied!</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Built with FastAPI &middot; SQLite &middot; nanoid</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
