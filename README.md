@@ -1,4 +1,4 @@
-# lnkshrnk — URL Shortener
+# lnkshrnk - URL Shortener
 
 > Paste a long link, get a short code. Custom aliases, dedup, click counting. FastAPI + SQLite + nanoid, single-file backend.
 
@@ -8,7 +8,7 @@ Live: `https://<your-render-service>.onrender.com` · Local: `http://127.0.0.1:8
 
 ## Overview
 
-`lnkshrnk` is a production-ready URL shortener built for Render’s free tier. No framework on the frontend — plain HTML/CSS/vanilla JS served as static files via FastAPI. No ORM — raw `sqlite3` with a fresh connection per request for thread safety under Uvicorn. Codes are generated with the Python `nanoid` package (`nanoid(size=6)`, alphabet `A-Za-z0-9_-`) with a 5-attempt collision retry.
+`lnkshrnk` is a production-ready URL shortener built for Render’s free tier. No framework on the frontend - plain HTML/CSS/vanilla JS served as static files via FastAPI. No ORM - raw `sqlite3` with a fresh connection per request for thread safety under Uvicorn. Codes are generated with the Python `nanoid` package (`nanoid(size=6)`, alphabet `A-Za-z0-9_-`) with a 5-attempt collision retry.
 
 Single job: **shorten a URL fast, with an optional human-readable code, and redirect reliably.**
 
@@ -17,40 +17,34 @@ Single job: **shorten a URL fast, with an optional human-readable code, and redi
 ## High-Level Architecture
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Client
-        B[Browser<br/>public/index.html + style.css + script.js]
+        B[Browser<br>public html css js]
     end
 
-    subgraph Server["FastAPI (main.py) — Uvicorn ASGI"]
-        A1["POST /api/shorten<br/>validate url + custom<br/>dedup lookup<br/>nanoid(6) ×5 retry"]
-        A2["GET /api/stats/{code}<br/>return {code, original, clicks, created_at}"]
-        A3["GET /{code}<br/>FileResponse fallback if '.' in code<br/>else SELECT + UPDATE clicks<br/>307 Redirect"]
-        S["StaticFiles mount<br/>public/ at '/' , html=True<br/>serves index.html for '/'"]
-        M{Route order}
-        M --> A1 --> A2 --> A3 --> S
+    subgraph Server[FastAPI + Uvicorn<br>main.py]
+        A1[POST /api/shorten<br>validate + dedup + nanoid]
+        A2[GET /api/stats/code]
+        A3[GET /code<br>redirect 307 + count clicks]
+        S[StaticFiles<br>public at /]
+        A1 --> A2 --> A3 --> S
     end
 
     subgraph Storage
-        DB[("SQLite — shortener.db<br/>table urls(code PK, original, clicks, created_at)")]
-        FS["Filesystem<br/>ephemeral on Render free tier"]
+        DB[(SQLite<br>urls table)]
+        FS[Filesystem<br>ephemeral on Render]
     end
 
-    subgraph External
-        NANO["nanoid package<br/>generate(size=6)"]
-        RENDER["Render — Python 3<br/>pip install -r requirements.txt<br/>uvicorn main:app --host 0.0.0.0 --port $PORT"]
-    end
-
-    B -- "fetch POST /api/shorten<br/>fetch GET /api/stats" --> A1 & A2
-    B -- "GET /{code} or /style.css" --> A3
-    A1 -- "get_conn() per call<br/>INSERT / SELECT" --> DB
-    A2 -- "SELECT" --> DB
-    A3 -- "SELECT + UPDATE clicks" --> DB
-    A3 -- "FileResponse(public/…) if dot in code" --> FS
-    S -- "serves index.html, fallback" --> B
-    A1 -- "generate" --> NANO
-    Server -- "deployed as" --> RENDER
-    DB -. "stored on" .-> FS
+    B --> A1
+    B --> A2
+    B --> A3
+    B --> S
+    A1 --> DB
+    A2 --> DB
+    A3 --> DB
+    A3 --> FS
+    S --> B
+    DB -. stored on .-> FS
 ```
 
 ### Request flows
@@ -160,13 +154,13 @@ All DB ops wrapped in `try/except` → `HTTPException` with 400/404/409/500, no 
 - **Card:** `2px` ink border + `6px` hard shadow, dotted hint `ORIGINAL ···· SHORT`.
 - **Inputs:** `input-wrap` with prefix `↳` / `/`, `JetBrains Mono` for codes, `field-help` for constraints.
 - **Button:** signal `#FF3B1F` with hard shadow, `→` shift on hover.
-- **Signature — ticket stub** (`public/style.css:299`): left `#FF3B1F` perforated spine + radial-gradient dots, `ticketIn` animation, mono `#short-link` + ink `Copy` button.
+- **Signature - ticket stub** (`public/style.css:299`): left `#FF3B1F` perforated spine + radial-gradient dots, `ticketIn` animation, mono `#short-link` + ink `Copy` button.
 - **Meta grid + footer** for dedup/clicks/length hints.
 - JS (`public/script.js`): `fetch` POST, handles `400/409` via `detail`, `showResult` re-triggers animation, clipboard via `navigator.clipboard` with `execCommand` fallback, live error clear on input.
 
 ---
 
-## Getting Started (local, venv only — no global pip)
+## Getting Started (local, venv only - no global pip)
 
 ```bash
 python3 -m venv venv
@@ -194,7 +188,7 @@ venv/bin/python -c "from fastapi.testclient import TestClient; ..."
 
 ---
 
-## Deployment — Render (free tier)
+## Deployment - Render (free tier)
 
 - Runtime: `Python 3`
 - Build: `pip install -r requirements.txt`
@@ -221,4 +215,4 @@ Zero changes needed from repo to Render.
 
 ## License
 
-MIT — see `LICENSE`.
+MIT - see `LICENSE`.
