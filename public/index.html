@@ -3,57 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lnkshrnk — URL Shortener</title>
+  <title>lnkshrnk — compress the long way</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="container">
-    <header class="header">
-      <h1 class="logo">lnkshrnk</h1>
-      <p class="tagline">Short links, simple &amp; fast.</p>
-    </header>
+  <div class="bg-grid" aria-hidden="true"></div>
 
-    <section class="card">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="wordmark" href="/" aria-label="lnkshrnk home">
+        <span class="mark-box" aria-hidden="true">↘</span>
+        lnkshrnk
+      </a>
+      <span class="header-meta">URL → short code · no tracking</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">
+        <span class="eyebrow-tag">compression utility</span>
+        <span class="eyebrow-line" aria-hidden="true"></span>
+        <span class="eyebrow-count">001</span>
+      </div>
+      <h1 class="title">A long link,<br><span class="title-accent">shortened.</span></h1>
+      <p class="lead">Paste any <code>https://</code> URL. Keep a custom code if you want it to read — 3 to 20 letters, numbers, <code>_</code> or <code>-</code>.</p>
+    </section>
+
+    <section class="card" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="visually-hidden">Shorten a URL</h2>
+
+      <!-- visual length hint -->
+      <div class="field-row field-row--url" aria-hidden="true">
+        <span class="field-hint">ORIGINAL</span>
+        <span class="hint-dots"></span>
+        <span class="field-hint">SHORT</span>
+      </div>
+
       <form id="shorten-form" autocomplete="off" novalidate>
         <div class="field">
-          <label for="url-input">Long URL</label>
-          <input
-            id="url-input"
-            type="url"
-            placeholder="https://example.com/very/long/url"
-            required
-          />
+          <label for="url-input">Long URL <span class="label-req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-prefix" aria-hidden="true">↳</span>
+            <input
+              id="url-input"
+              type="url"
+              inputmode="url"
+              placeholder="https://example.com/very/long/path?with=params"
+              required
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
         </div>
 
         <div class="field">
-          <label for="custom-input">Custom code <span class="optional">(optional, 3-20 chars: A-Z a-z 0-9 _ -)</span></label>
-          <input
-            id="custom-input"
-            type="text"
-            placeholder="my-code"
-            maxlength="20"
-            pattern="[A-Za-z0-9_-]{3,20}"
-          />
+          <label for="custom-input">Custom code <span class="optional">— optional</span></label>
+          <div class="input-wrap input-wrap--mono">
+            <span class="input-prefix" aria-hidden="true">/</span>
+            <input
+              id="custom-input"
+              type="text"
+              placeholder="my-code"
+              maxlength="20"
+              pattern="[A-Za-z0-9_-]{3,20}"
+              autocomplete="off"
+              spellcheck="false"
+              autocapitalize="off"
+            />
+          </div>
+          <p class="field-help">3–20 chars: A–Z a–z 0–9 _ - · Reserved: api, admin, static, favicon.ico</p>
         </div>
 
-        <button id="submit-btn" type="submit">Shorten</button>
+        <button id="submit-btn" type="submit">
+          <span class="btn-label">Shorten URL</span>
+          <span class="btn-arrow" aria-hidden="true">→</span>
+        </button>
       </form>
 
-      <!-- Feedback areas -->
       <p id="error-msg" class="msg error hidden" role="alert"></p>
 
-      <div id="result" class="result hidden">
-        <p class="result-label">Your short URL:</p>
-        <div class="result-row">
-          <a id="short-link" href="#" target="_blank" rel="noopener noreferrer"></a>
-          <button id="copy-btn" type="button">Copy</button>
+      <div id="result" class="ticket hidden" aria-live="polite">
+        <div class="ticket-perf" aria-hidden="true"></div>
+        <div class="ticket-body">
+          <div class="ticket-label">Your short link <span class="ticket-dot" aria-hidden="true">●</span> ready</div>
+          <div class="ticket-row">
+            <a id="short-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+            <button id="copy-btn" type="button" aria-label="Copy short link">
+              <span class="copy-icon" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="4.5" y="4.5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M11.5 4.5V3.5A1.5 1.5 0 0 0 10 2H4.5A1.5 1.5 0 0 0 3 3.5V9a1.5 1.5 0 0 0 1.5 1.5H5.5" stroke="currentColor" stroke-width="1.3"/></svg>
+              </span>
+              <span class="copy-text">Copy</span>
+            </button>
+          </div>
+          <p id="copy-feedback" class="copy-feedback hidden" role="status">Copied to clipboard</p>
         </div>
-        <p id="copy-feedback" class="copy-feedback hidden">Copied!</p>
+      </div>
+    </section>
+
+    <section class="meta-grid">
+      <div class="meta-item">
+        <span class="meta-k">Dedup</span>
+        <span class="meta-v">Same URL returns same code</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-k">Clicks</span>
+        <span class="meta-v">Counted on redirect · <a href="#" class="meta-link" onclick="document.getElementById('url-input').focus(); return false;">stats at /api/stats/{code}</a></span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-k">Length</span>
+        <span class="meta-v">Auto code is 6 chars via nanoid</span>
       </div>
     </section>
 
     <footer class="footer">
-      <p>Built with FastAPI &middot; SQLite &middot; nanoid</p>
+      <span>Built with FastAPI · SQLite · nanoid</span>
+      <span class="footer-sep" aria-hidden="true">—</span>
+      <span>Filesystem is ephemeral on Render free tier</span>
     </footer>
   </main>
 

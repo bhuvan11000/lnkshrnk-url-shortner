@@ -8,11 +8,13 @@
   const shortLink = document.getElementById("short-link");
   const copyBtn = document.getElementById("copy-btn");
   const copyFeedback = document.getElementById("copy-feedback");
+  const btnLabel = submitBtn.querySelector(".btn-label");
 
   function showError(message) {
     errorMsg.textContent = message;
     errorMsg.classList.remove("hidden");
     result.classList.add("hidden");
+    errorMsg.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function hideError() {
@@ -23,8 +25,14 @@
   function showResult(shortUrl) {
     shortLink.textContent = shortUrl;
     shortLink.href = shortUrl;
+    // re-trigger ticket animation
+    result.classList.add("hidden");
+    void result.offsetWidth;
     result.classList.remove("hidden");
     copyFeedback.classList.add("hidden");
+    copyBtn.querySelector(".copy-text").textContent = "Copy";
+    // subtle focus for keyboard users
+    shortLink.focus({ preventScroll: true });
   }
 
   form.addEventListener("submit", async (e) => {
@@ -37,12 +45,15 @@
     const custom = customInput.value.trim();
 
     if (!url) {
-      showError("Please enter a URL.");
+      showError("Enter a URL starting with http:// or https://");
+      urlInput.focus();
       return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Shortening…";
+    if (btnLabel) btnLabel.textContent = "Shortening…";
+    else submitBtn.textContent = "Shortening…";
+    submitBtn.setAttribute("aria-busy", "true");
 
     const payload = { url };
     if (custom) payload.custom = custom;
@@ -68,11 +79,13 @@
       }
 
       showResult(data.short);
-    } catch (err) {
-      showError("Network error — please check your connection and try again.");
+    } catch {
+      showError("Network error — check your connection and try again.");
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Shorten";
+      submitBtn.removeAttribute("aria-busy");
+      if (btnLabel) btnLabel.textContent = "Shorten URL";
+      else submitBtn.textContent = "Shorten URL";
     }
   });
 
@@ -84,7 +97,6 @@
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
       } else {
-        // Fallback for older browsers
         const ta = document.createElement("textarea");
         ta.value = text;
         ta.style.position = "fixed";
@@ -95,13 +107,21 @@
         document.body.removeChild(ta);
       }
       copyFeedback.classList.remove("hidden");
-      copyBtn.textContent = "Copied!";
+      const ct = copyBtn.querySelector(".copy-text");
+      if (ct) ct.textContent = "Copied!";
+      else copyBtn.textContent = "Copied!";
       setTimeout(() => {
         copyFeedback.classList.add("hidden");
-        copyBtn.textContent = "Copy";
+        const ct2 = copyBtn.querySelector(".copy-text");
+        if (ct2) ct2.textContent = "Copy";
+        else copyBtn.textContent = "Copy";
       }, 2000);
     } catch {
-      showError("Failed to copy — please copy the link manually.");
+      showError("Copy failed — select the link and copy manually.");
     }
   });
+
+  // live clear error on input
+  urlInput.addEventListener("input", hideError);
+  customInput.addEventListener("input", hideError);
 })();
