@@ -1,0 +1,7 @@
+# Linguist overrides — ensure Python is detected as primary language
+# CSS remains counted after trimming (now ~8kB vs Python ~16kB), but we mark
+# it vendored as a safety net so future CSS growth never flips the primary
+# language back to CSS. Comment out if you want CSS counted again.
+public/style.css linguist-vendored
+public/script.js linguist-vendored
+# Keep HTML counted (small) — not vendored
