@@ -2,7 +2,7 @@
 
 > Paste a long link, get a short code. Custom aliases, dedup, click counting. FastAPI + SQLite + nanoid, single-file backend.
 
-Live: `https://<your-render-service>.onrender.com` · Local: `http://127.0.0.1:8000`
+Try it here (deployed on Render): https://lnkshrnk.onrender.com/
 
 ---
 
