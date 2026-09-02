@@ -70,8 +70,6 @@ GET /Ab3x9 → if "." in code: Path("public"/code).is_file() ? FileResponse : 40
            → 307 RedirectResponse to original
 ```
 
-> Route ordering is intentional: API routes → redirect (`/{code}` with FileResponse dot-fallback) → `app.mount("/", StaticFiles(directory="public", html=True))`. This satisfies the spec (“mount AFTER redirect”) while avoiding shadowing of `/style.css`/`/script.js`.
-
 **3. Stats** `GET /api/stats/{code}` → `SELECT code, original, clicks, created_at` → 404 if missing.
 
 **Thread safety:** `get_conn()` (`main.py:23`) opens a fresh `sqlite3` connection per call (`row_factory=Row`), closed in `finally`. Table init runs on import and on `startup` event (`main.py:53`).
